@@ -1,0 +1,12 @@
+- name: Creates directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: '{{ user }}'
+    group: '{{ user }}'
+    mode: '0744'
+  loop:
+    - /home/{{ user }}/app/core
+    - /home/{{ user }}/app/database
+
+- import_tasks: ini_containers.yml

@@ -1,0 +1,11 @@
+- name: Copy files
+  copy:
+    src: docker-compose.yml
+    dest: /home/{{ user }}/app/database
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Deploy docker files
+  community.docker.docker_compose:
+    project_src: /home/{{ user }}/app/database
+    files: docker-compose.yml

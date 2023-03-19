@@ -1,0 +1,10 @@
+[all:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_ssh_user='dps-admin'
+ansible_ssh_pass='nntu19'
+ansible_sudo_pass='nntu19'
+user='dps-admin'
+ansible_python_interpreter=/bin/python3
+
+[nodes]
+nntu.dps.bt-node-1 ansible_host=0.0.0.0 ansible_ssh_user='dps-admin' ansible_ssh_pass='nntu19' ansible_sudo_pass='nntu19'

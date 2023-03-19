@@ -1,0 +1,4 @@
+- hosts: nodes
+  any_errors_fatal: true
+  roles:
+    - ../roles/ini_code
