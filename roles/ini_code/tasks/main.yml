@@ -6,7 +6,9 @@
     group: '{{ user }}'
     mode: '0744'
   loop:
-    - /home/{{ user }}/app/core
+    - /home/{{ user }}/app/bot/core
+    - /home/{{ user }}/app/bot/logs
+    - /home/{{ user }}/app/bot/tmp
     - /home/{{ user }}/app/database
 
 - import_tasks: ini_containers.yml
