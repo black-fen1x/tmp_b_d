@@ -2,11 +2,12 @@
 Main bot configuration
 01.02.2023
 """
+import os
 
 """
 Bot Variables
 """
-tbot = '5603968485:AAFZXknpkztEatCwxSouNcSbt5EHbOVnO4E'
+tbot = os.getenv('BOT_TOKEN')
 
 """
 DataBase Variables

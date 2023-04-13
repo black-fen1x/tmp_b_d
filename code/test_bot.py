@@ -8,12 +8,11 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import config
 import db
 import logging
-import asyncio
-import os
 import numpy as np
 import getTeacher
 
 class UserState(StatesGroup):
+    signupState = State()
     teacherState = State()
     chosenDay = State()
     timeSchedule = State()
@@ -70,9 +69,10 @@ async def start_command(message: types.Message):
     if(not dbs.user_exists(message.from_user.id)):
         dbs.add_user(message.from_user.id, message.from_user.first_name)
         await message.delete()
+        await UserState.signupState.set()
         await bot.send_message(message.from_user.id, "Укажите вашу группу")
-        @dp.message_handler()
-        async def bot_message(message: types.Message):
+        @dp.message_handler(state=UserState.signupState)
+        async def bot_message(message: types.Message, state: FSMContext):
             if message.chat.type == "private":
                 if message.text == "text":
                     pass
@@ -81,6 +81,7 @@ async def start_command(message: types.Message):
                         dbs.set_group(message.from_user.id, message.text)
                         dbs.set_signup(message.from_user.id, "true")
                         await bot.send_message(message.from_user.id, "Успешная авторизация", reply_markup=kb_schedule)
+                        await state.finish()
     else:
         await bot.send_message(message.from_user.id, "Регистрация была произведена ранее!", reply_markup=kb_schedule)
         await message.delete()
@@ -112,9 +113,10 @@ async def mailing_command(message: types.Message):
                 @dp.message_handler(state=UserState.mailingMessageState)
                 async def mailing_message(message: types.Message, state: FSMContext):
                     await bot.send_message(mass[i][0], text=message.text)
-                    await bot.send_message(message.from_user.id, "Отправлено!") 
-                    await state.finish()          
-                
+                    await bot.send_message(message.from_user.id, "Отправлено!")
+                    await state.finish()
+    else: await bot.send_message(message.from_user.id, "Недостаточно прав для выполнения команды!")
+
 @dp.message_handler(lambda message: message.text == 'Найти группу')
 async def find_group(message: types.Message):
     groups = getTeacher.getAvailableGroups()
@@ -127,7 +129,7 @@ async def find_group(message: types.Message):
             break
     groupsKb.row(InlineKeyboardButton(text="Назад", callback_data=f"prGroups|{counter}"), InlineKeyboardButton(text="Вперед", callback_data=f"nxGroups|{counter}"))
     groupsKb.add(cancelButton)
-    await message.answer("Выберите группу", reply_markup=groupsKb)                   
+    await message.answer("Выберите группу", reply_markup=groupsKb)
 
 @dp.callback_query_handler(Text(startswith="nxGroups"))
 async def next_groups(callback: types.CallbackQuery, state: FSMContext):
@@ -269,7 +271,7 @@ async def next_teacher(callback: types.CallbackQuery):
             listEnd = True
             break
         data = f"tcr_{keys[i]}"
-        print("buttonSize: " + str(len(data.encode('utf-8'))))
+        #print("buttonSize: " + str(len(data.encode('utf-8'))))
         teachers.add(InlineKeyboardButton(text=keys[i], callback_data=data))
         counterTmp += 1
         if counterTmp % 5 == 0:
@@ -278,11 +280,11 @@ async def next_teacher(callback: types.CallbackQuery):
         teachers.row(InlineKeyboardButton(text="Назад", callback_data=f"prTchrs|{counter + counterTmp}"))
     else:
         teachers.row(InlineKeyboardButton(text="Назад", callback_data=f"prTchrs|{counter + counterTmp}"),InlineKeyboardButton(text="Далее", callback_data=f"nxTchrs|{counter + counterTmp}"))
-    print("#######################")
+    #print("#######################")
     teachers.add(cancelButton)
     await callback.message.edit_reply_markup(reply_markup=teachers)
     await callback.answer()
-    
+
 @dp.callback_query_handler(lambda c: c.data.startswith("prTchrs"))
 async def previous_teacher(callback: types.CallbackQuery):
     schedule: dict = getTeacher.getSchedule()

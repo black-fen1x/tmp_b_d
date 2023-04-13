@@ -1,9 +1,9 @@
 import json
 import codecs
 import re
-from datetime import datetime 
+from datetime import datetime
 
-def findTeacher(teacher="", day="", time="",schedule={}): 
+def findTeacher(teacher="", day="", time="",schedule={}):
     lessons = schedule[teacher][day]
     if (len(lessons) == 0):
         return None
@@ -51,7 +51,7 @@ def findGroup(group="", day="", time="", schedule={}):
     return None
 
 def getSchedule():
-    fileObj = codecs.open( "test.json", "r", "utf_8_sig" )
+    fileObj = codecs.open( "code\\test.json", "r", "utf_8_sig" )
     schedule: dict = json.load(fileObj)
     return schedule
 
@@ -83,7 +83,7 @@ def getAvailableGroups():
     return sorted(list(groups))
 
 def main():
-    fileObj = codecs.open( "test.json", "r", "utf_8_sig" )
+    fileObj = codecs.open( "code\\test.jsont", "r", "utf_8_sig" )
     schedule: dict = getSchedule()
     # print(findTeacher('Бухнин Алексей Викторович', "Понедельник", "13:10", schedule))
     # print(findGroup('20СБК', 'Понедельник', '10:50', schedule))
