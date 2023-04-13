@@ -12,7 +12,7 @@ tbot = os.getenv('BOT_TOKEN')
 """
 DataBase Variables
 """
-host = '192.168.0.160'
-user = 'root'
-password = 'root1234'
-db_name = 'users'
+host = os.getenv('HOST_NAME_DB')
+user = os.getenv('USER_NAME_DB')
+password = os.getenv('PASSWORD_DB')
+db_name = os.getenv('DB_NAME')
