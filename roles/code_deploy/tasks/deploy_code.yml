@@ -1,0 +1,23 @@
+- name: Copy code
+  copy:
+    src: ./code/
+    dest: /home/{{ user }}/app/bot/core
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Copy files
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ user }}/app/bot/core
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  loop:
+    - 'docker-compose.yml'
+    - 'Dockerfile'
+    - '.env'
+
+- name: Deploy docker files
+  community.docker.docker_compose:
+    project_src: /home/{{ user }}/app/bot
+    build: true
+    files: docker-compose.yml
