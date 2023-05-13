@@ -96,7 +96,7 @@ async def change_group(message: types.Message):
             dbs.set_group(message.from_user.id, message.text)
             await bot.send_message(message.from_user.id, "Группа успешно изменена!")
             await state.finish()
-
+"""
 @dp.message_handler(lambda message: message.text == 'Рассылка')
 async def mailing_command(message: types.Message):
     if message.chat.type == "private" and np.array(dbs.get_role(message.from_user.id))[0][0] == True:
@@ -113,7 +113,27 @@ async def mailing_command(message: types.Message):
                 async def mailing_message(message: types.Message, state: FSMContext):
                     await bot.send_message(mass[i][0], text=message.text)
                     await bot.send_message(message.from_user.id, "Отправлено!") 
-                    await state.finish()          
+                    await state.finish()        
+""" 
+
+@dp.message_handler(lambda message: message.text == 'Рассылка')
+async def mailing_command(message: types.Message):
+    if message.chat.type == "private" and np.array(dbs.get_role(message.from_user.id))[0][0] == True:
+        await message.delete()
+        await UserState.mailingCommandState.set()
+        await bot.send_message(message.from_user.id, "Введите группу для рассылки")
+        @dp.message_handler(state=UserState.mailingCommandState)
+        async def mailing_command(message: types.Message, state: FSMContext):
+            mass = np.array(dbs.all_chat(message.text))
+            for i in range (len(mass)):
+                await bot.send_message(message.from_user.id, "Введите сообщение")
+                await UserState.next()
+                @dp.message_handler(state=UserState.mailingMessageState)
+                async def mailing_message(message: types.Message, state: FSMContext):
+                    await bot.send_message(mass[i][0], text=message.text)
+                    await bot.send_message(message.from_user.id, "Отправлено!")
+                    await state.finish()
+    else: await bot.send_message(message.from_user.id, "Недостаточно прав для выполнения команды!")
                 
 @dp.message_handler(lambda message: message.text == 'Найти группу')
 async def find_group(message: types.Message):
